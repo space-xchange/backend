@@ -1,13 +1,12 @@
 from typing import Annotated
+import jwt
+from fastapi import Cookie, HTTPException
+from sql_app.model import User
+from app.utils import KEY
 
-from fastapi import Header, HTTPException
-
-
-async def get_token_header(x_token: Annotated[str, Header()]):
-	if x_token != "fake-super-secret-token":
-		raise HTTPException(status_code=400, detail="X-Token header invalid")
-
-
-async def get_query_token(token: str):
-	if token != "jessica":
-		raise HTTPException(status_code=400, detail="No Jessica token provided")
+async def get_token_header(token: Annotated[str | None, Cookie()]):
+	try:
+		decoded = jwt.decode(token, KEY, algorithms="HS256")
+		print(decoded)
+	except Exception as e: 
+		print(e)
