@@ -1,12 +1,14 @@
 from typing import Annotated
-import jwt
-from fastapi import Cookie, HTTPException
+from fastapi import Cookie, HTTPException, status
 from sql_app.model import User
-from app.utils import KEY
+
+from app.utils import TokenDecode
 
 async def get_token_header(token: Annotated[str | None, Cookie()]):
-	try:
-		decoded = jwt.decode(token, KEY, algorithms="HS256")
-		print(decoded)
-	except Exception as e: 
-		print(e)
+    if token is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="There is no token")
+    try:
+        decoded = TokenDecode(token)
+        return decoded
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))

@@ -5,6 +5,7 @@ from sql_app.database import DatabaseSession, engine
 from sql_app.model import User, Base
 from sqlalchemy.exc import SQLAlchemyError
 from app.utils import IdGen, TokenEncode, Hasher, VerifyMismatchError
+from typing import Annotated
 
 router = APIRouter( prefix="/users",
     tags=["users"],
@@ -63,7 +64,7 @@ async def create_user(user: RegisterUserBase, db: DatabaseSession):
             "username": db_user.username,
         }
 
-        return user
+        return content
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e.__dict__['orig']))
 
@@ -84,3 +85,7 @@ async def get_user (user: LoginUserBase, db: DatabaseSession, response: Response
     encoded = TokenEncode(content)
     response.set_cookie(key="token", value=encoded, httponly=True)
     return content
+
+@router.post("/", status_code=200)
+async def auth(user: Annotated[dict, Depends(get_token_header)]):
+    return user
