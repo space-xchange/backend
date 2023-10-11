@@ -120,7 +120,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# Temporary remove it to demo at school
+# .env 
 .venv
 env/
 venv/

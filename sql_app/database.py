@@ -5,11 +5,12 @@ from sqlalchemy.orm import Session
 from typing import Generator, Annotated
 from fastapi import Depends
 
-# DATABASE_URL = "mariadb+pymysql://s103808977:300903@feenix-mariadb.swin.edu.au/s103808977_db"
+from dotenv import load_dotenv
+import os
 
-DATABASE_URL = "sqlite:///./test.db"
+load_dotenv()
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(os.environ['DATABASE_URL'])
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

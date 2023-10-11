@@ -16,6 +16,8 @@ pymysql = "^1.1.0"
 argon2-cffi = "^23.1.0"
 sonyflake-py = "^1.3.0"
 pyjwt = "^2.8.0"
+python-dotenv = "^1.0.0"
+python-paseto = "^0.5.2"
 
 
 [build-system]
