@@ -18,6 +18,8 @@ sonyflake-py = "^1.3.0"
 python-dotenv = "^1.0.0"
 python-paseto = "^0.5.2"
 msgpack = "^1.0.7"
+web3 = "^6.11.0"
+py-solc-x = "^1.1.1"
 
 
 [build-system]

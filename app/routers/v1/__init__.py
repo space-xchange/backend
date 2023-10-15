@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from . import users
+from . import users, dapp, crypto
 
 router = APIRouter(
     prefix="/v1",
@@ -9,3 +9,5 @@ router = APIRouter(
 )
 
 router.include_router(users.router)
+router.include_router(dapp.router)
+router.include_router(crypto.router)

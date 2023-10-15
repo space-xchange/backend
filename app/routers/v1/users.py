@@ -1,4 +1,5 @@
-from app.dependencies import get_token_header
+from app.dependencies import get_token_header, get_web3
+from dapp.ganache import get_new_account
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel
 from sql_app.database import DatabaseSession, engine
@@ -7,13 +8,17 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.utils import IdGen, TokenEncode, Hasher, VerifyMismatchError
 from typing import Annotated
 
-router = APIRouter( prefix="/users",
+router = APIRouter(
+    prefix="/users",
     tags=["users"],
     # dependencies=[Depends(get_token_header)],
     responses={404: {"description": "Not found"}},
 )
 
 Base.metadata.create_all(bind=engine)
+
+Web3Session = Annotated[None, Depends(get_web3)]
+UserSession = Annotated[dict, Depends(get_token_header)]
 
 class RegisterUserBase(BaseModel):
     username: str
@@ -26,7 +31,7 @@ class RegisterUserBase(BaseModel):
                 {
                     "username": "Kodo",
                     "email": "kodo@gmail.com",
-                    "password": "P@55w.rd"
+                    "password": "12345678"
                 }
             ]
         }
@@ -41,20 +46,21 @@ class LoginUserBase(BaseModel):
             "examples": [
                 {
                     "email": "kodo@gmail.com",
-                    "password": "P@55w.rd"
+                    "password": "12345678"
                 }
             ]
         }
     }
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def create_user(user: RegisterUserBase, db: DatabaseSession):
+async def create_user(user: RegisterUserBase, db: DatabaseSession, web3: Web3Session):
     try:
         db_user = User(
             user_id = IdGen.next_id(),
             username = user.username,
             email = user.email,
             password = Hasher.hash(user.password),
+            address = get_new_account(web3),
         )
         db.add(db_user)
         db.commit()
@@ -62,15 +68,18 @@ async def create_user(user: RegisterUserBase, db: DatabaseSession):
         content = {
             "email": db_user.email,
             "username": db_user.username,
+            "address": db_user.address,
         }
 
         return content
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e.__dict__['orig']))
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e.__dict__['orig']))
 
 
 @router.post("/login", status_code=status.HTTP_201_CREATED)
-async def get_user (user: LoginUserBase, db: DatabaseSession, response: Response):
+async def get_user(user: LoginUserBase, db: DatabaseSession, response: Response):
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user is None: 
         raise HTTPException(status_code=404, detail="Wrong Email")
@@ -81,11 +90,12 @@ async def get_user (user: LoginUserBase, db: DatabaseSession, response: Response
     content = {
         "email": db_user.email,
         "username": db_user.username,
+        "address": db_user.address,
     }
     encoded = TokenEncode(content)
     response.set_cookie(key="token", value=encoded, httponly=True)
     return content
 
 @router.post("/", status_code=200)
-async def auth(user: Annotated[dict, Depends(get_token_header)]):
+async def auth(user: UserSession):
     return user
