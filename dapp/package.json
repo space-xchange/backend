@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "ganache": "ganache"
+    "ganache": "ganache-cli"
   },
   "keywords": [],
   "author": "",
