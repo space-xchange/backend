@@ -116,8 +116,6 @@ async def get_transactions(user: UserSession, web3: Web3Session, contract: Contr
         raise HTTPException(status_code=500, detail=f"Error fetching events: {str(e)}")
 
     # Convert events to a more friendly format
-    print(sold_events)
-    print(purchased_events)
     sold_data = [{"type": "sell", "blockNumber": event['blockNumber'], "crypto": event['args']['ticker'], "total": event['args']['total_received']} for event in sold_events]
     purchased_data = [{"type": "purchase", "blockNumber": event['blockNumber'], "crypto": event['args']['ticker'], "total": event['args']['total_cost']} for event in purchased_events]
 
