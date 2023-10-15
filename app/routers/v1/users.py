@@ -98,3 +98,8 @@ async def get_user(user: LoginUserBase, db: DatabaseSession, response: Response)
 @router.get("/", status_code=200)
 async def auth(user: UserSession):
     return user
+
+@router.get("/logout", status_code=200)
+async def logout(response: Response):
+    response.set_cookie(key="token", value="", httponly=True)
+    return

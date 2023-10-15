@@ -28,7 +28,7 @@ async def get_all_cryptos(db: DatabaseSession):
 
     for raw_crypto in raw_cryptos:
         raw_crypto.img = f"https://www.gemini.com/images/currencies/icons/default/{raw_crypto.name}.svg"
-        raw_crypto.diff = (raw_crypto.values[cur - start_id].value_aud - raw_crypto.values[end].value_aud) / raw_crypto.values[cur - start_id].value_aud * 100 * 100
+        raw_crypto.diff = (raw_crypto.values[cur - start_id - 1].value_aud - raw_crypto.values[end].value_aud) / raw_crypto.values[cur - start_id - 1].value_aud * 100 * 100
         cryptos.append(raw_crypto)
 
     return cryptos
