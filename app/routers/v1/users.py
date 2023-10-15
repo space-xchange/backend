@@ -95,6 +95,6 @@ async def get_user(user: LoginUserBase, db: DatabaseSession, response: Response)
     response.set_cookie(key="token", value=encoded, httponly=True)
     return content
 
-@router.post("/", status_code=200)
+@router.get("/", status_code=200)
 async def auth(user: UserSession):
     return user
