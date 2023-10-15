@@ -12,7 +12,6 @@ router = APIRouter(
     prefix="/users",
     tags=["users"],
     # dependencies=[Depends(get_token_header)],
-    responses={404: {"description": "Not found"}},
 )
 
 Base.metadata.create_all(bind=engine)
@@ -82,11 +81,11 @@ async def create_user(user: RegisterUserBase, db: DatabaseSession, web3: Web3Ses
 async def get_user(user: LoginUserBase, db: DatabaseSession, response: Response):
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user is None: 
-        raise HTTPException(status_code=404, detail="Wrong Email")
+        raise HTTPException(status_code=401, detail="Wrong Email")
     try:
         Hasher.verify(db_user.password, user.password)
     except VerifyMismatchError:
-        raise HTTPException(status_code=404, detail="Wrong Password")
+        raise HTTPException(status_code=401, detail="Wrong Password")
     content = {
         "email": db_user.email,
         "username": db_user.username,
